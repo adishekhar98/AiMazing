@@ -1,4 +1,4 @@
-function Ray(angle) {
+function Ray(angle, agent) {
   this.pos = createVector(agent.pos.x, agent.pos.y);
   this.dir = p5.Vector.fromAngle(angle);
 

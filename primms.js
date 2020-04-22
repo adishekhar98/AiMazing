@@ -3,7 +3,7 @@ let wall;
 let lastCell;
 
 function primms() {
-  resetMaze();
+  resetButtonPressed();
   startIndex = 0;
 
   for (i = 0; i < getWalls(startIndex).length; i++) {

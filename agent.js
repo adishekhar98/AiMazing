@@ -1,4 +1,4 @@
-function Agent(x, y) {
+function Agent(x, y, brain) {
   this.pos = createVector(x, y);
   this.vel = createVector();
   this.acc = createVector();
@@ -6,6 +6,28 @@ function Agent(x, y) {
   this.intersecting = false;
   this.rays = [];
   this.sightRange = scl * 5;
+  this.distToEnd = dist(this.pos.x, this.pos.y, end.x + scl / 2, end.y + scl / 2);
+  this.dead = false;
+  this.finished = false;
+  this.brain;
+  this.score = 0;
+  this.fitness = 0;
+  this.newBrain = false;
+
+  this.rays = [];
+  for (var i = 0; i < 360; i += 30) {
+    this.rays.push(new Ray(radians(i), this));
+  }
+
+  if (brain) {
+    this.newBrain = false;
+    console.log('newBrain  = '+ this.newBrain);
+    this.brain = brain.copy();
+  } else if (!brain) {
+    this.newBrain = true;
+    console.log('newBrain  = '+ this.newBrain);
+    this.brain = new NeuralNetwork(this.rays.length, this.rays.length, 1);
+  }
 
   this.show = function() {
     fill(255, 255, 255, 100);
@@ -17,16 +39,31 @@ function Agent(x, y) {
 
   }
 
-  this.createRays = function() {
-    this.rays = [];
-    for (var i = 0; i < 360; i += 30) {
-      this.rays.push(new Ray(radians(i)));
-    }
+  // this.createRays = function() {
+  //   this.rays = [];
+  //   for (var i = 0; i < 360; i += 30) {
+  //     this.rays.push(new Ray(radians(i)));
+  //   }
+  // }
 
-  this.createNN = function(){
-    this.brain = new NeuralNetwork(this.rays.length, this.rays.length, 1);
+  // this.createNN = function(){
+  //   if (!this.newBrain){
+  //     console.log('created with existing brain ', brain, ', copying brain...');
+  //     this.brain = brain.copy();
+  //   } else{
+  //     console.log('creating new brain for ', this);
+  //     this.brain = new NeuralNetwork(this.rays.length, this.rays.length, 1);
+  //   }
+  // }
+
+  this.mutate = function(){
+    console.log('agent.mutate function called');
+    console.log('newBrain is ' + this.newBrain, ' ... ', this.brain);
+    this.brain.mutate(0.1);
   }
 
+  this.dispose = function(){
+    this.brain.dispose();
   }
 
   this.update = function() {
@@ -34,19 +71,25 @@ function Agent(x, y) {
     for (ray of this.rays){
       ray.update();
     }
+    if (!this.dead){
     this.move(this.castRays());
+    }
+
     // for (ray of this.rays){
     //   ray.show();
     // }
 
 
-    if (this.checkCollisions()) {
-      this.pos.set(start.i + scl / 2, start.j + scl / 2);
-      this.vel.set(0, 0);
-    }
+    // if (this.checkCollisions()) {
+    //   this.pos.set(start.i + scl / 2, start.j + scl / 2);
+    //   this.vel.set(0, 0);
+    // }
+
+
     this.vel.add(this.acc);
     this.pos.add(this.vel);
     this.acc.mult(0);
+    this.distToEnd = dist(this.pos.x, this.pos.y, end.x + scl / 2, end.y + scl / 2);
   }
 
   this.move = function(force) {
@@ -96,6 +139,7 @@ function Agent(x, y) {
   this.castRays = function() {
     this.inputs = [];
     let closestBarriers = [];
+
     for (let ray of this.rays) {
       let closest = null;
       let record = this.sightRange;
@@ -107,13 +151,21 @@ function Agent(x, y) {
             record = d;
             closest = pt;
           }
+
+          if (record - this.rad <= 0  ) {
+            this.dead = true;
+          }
+
+          if (this.distToEnd < this.rad * 2) {
+            this.finished = true;
+          }
         }
       }
       if (closest) {
         push();
         stroke(255, 0 , 0);
         //translate(this.pos.x,this.pos.y);
-        line(ray.pos.x, ray.pos.y , closest.x, closest.y);
+        //line(ray.pos.x, ray.pos.y , closest.x, closest.y);
 
         pop();
       }
@@ -130,6 +182,15 @@ function Agent(x, y) {
     steering.setMag(1);
     return steering;
     //console.log(closestBarriers);
+  }
+
+  this.calculateFitness = function(){
+    if (this.finished){
+      this.fitness = 1;
+    } else {
+      this.fitness = constrain(1 / this.distToEnd,0,1);
+
+    }
   }
 
 }
