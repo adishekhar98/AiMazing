@@ -12,7 +12,12 @@ function Agent(x, y, brain) {
   this.brain;
   this.score = 0;
   this.fitness = 0;
-  this.newBrain = false;
+  this.lifespan = 0;
+  this.hitWall = false;
+  this.goalVector = createVector(end.x, end.y);
+  this.maxForce = 1;
+  this.maxSpeed = 4;
+  this.steering;
 
   this.rays = [];
   for (var i = 0; i < 360; i += 30) {
@@ -20,18 +25,17 @@ function Agent(x, y, brain) {
   }
 
   if (brain) {
-    this.newBrain = false;
-    console.log('newBrain  = '+ this.newBrain);
     this.brain = brain.copy();
   } else if (!brain) {
-    this.newBrain = true;
-    console.log('newBrain  = '+ this.newBrain);
-    this.brain = new NeuralNetwork(this.rays.length, this.rays.length, 1);
+    this.brain = new NeuralNetwork(this.rays.length, this.rays.length + 3, 1);
   }
 
   this.show = function() {
     fill(255, 255, 255, 100);
     ellipse(this.pos.x, this.pos.y, this.rad * 2);
+
+
+    //drawArrow(this.pos, this.goalVector, 'blue');
 
     // for (ray of this.rays) {
     //   ray.show();
@@ -57,9 +61,7 @@ function Agent(x, y, brain) {
   // }
 
   this.mutate = function(){
-    console.log('agent.mutate function called');
-    console.log('newBrain is ' + this.newBrain, ' ... ', this.brain);
-    this.brain.mutate(0.1);
+    this.brain.mutate(MUTATION_RATE);
   }
 
   this.dispose = function(){
@@ -67,12 +69,17 @@ function Agent(x, y, brain) {
   }
 
   this.update = function() {
+    this.lifespan++;
+
+    if(this.lifespan >= agent_lifespan){
+      this.dead = true;
+    }
     //getBarriers();
     for (ray of this.rays){
       ray.update();
     }
     if (!this.dead){
-    this.move(this.castRays());
+    this.castRays();
     }
 
     // for (ray of this.rays){
@@ -87,9 +94,14 @@ function Agent(x, y, brain) {
 
 
     this.vel.add(this.acc);
+    this.vel.limit(this.maxSpeed);
     this.pos.add(this.vel);
-    this.acc.mult(0);
+    //this.acc.mult(0);
     this.distToEnd = dist(this.pos.x, this.pos.y, end.x + scl / 2, end.y + scl / 2);
+
+    for (ray of this.rays){
+      ray.rotate(this.vel.heading());
+    }
   }
 
   this.move = function(force) {
@@ -153,6 +165,7 @@ function Agent(x, y, brain) {
           }
 
           if (record - this.rad <= 0  ) {
+            this.hitWall = true;
             this.dead = true;
           }
 
@@ -162,26 +175,57 @@ function Agent(x, y, brain) {
         }
       }
       if (closest) {
-        push();
-        stroke(255, 0 , 0);
-        //translate(this.pos.x,this.pos.y);
+        //push();
+        //stroke(255, 0 , 0);
         //line(ray.pos.x, ray.pos.y , closest.x, closest.y);
 
-        pop();
+        //pop();
       }
 
+      // Push each ray distance into the input for the NN
       this.inputs.push( map(record, 0, this.sightRange, 1, 0));
 
 
     }
+
+    // Push the Euclidian Distance from the agent to the goal to the input for the NN
+    //this.inputs.push(map(this.distToEnd, 0, dist(0,0,width,height), 0, 1));
+
+    // Push
+    //this.goalVector.set(end.x, end.y);
+    //this.goalVector.sub(this.pos);
+    //this.goalVector.normalize();
+
+    //let input_x = map(this.goalVector.x,-1,1,0,1);
+    //let input_y = map(this.goalVector.y,-1,1,0,1);
+
+    //this.inputs.push(input_x);
+    //this.inputs.push(input_y);
+
+
+
+    //console.log(goalVector);
+
+
+
+
+
     let output = this.brain.predict(this.inputs);
+
+    //let output_x = map(output[0], 0, 1, -1, 1);
+    //let output_y = map(output[1], 0, 1, -1, 1);
+
     let angle = map(output[0], 0, 1, 0, TWO_PI);
+    //angle += this.vel.heading();
     let desired = p5.Vector.fromAngle(angle);
 
+    //let desired = createVector(output_x, output_y);
+
     let steering = desired.sub(this.vel);
-    steering.setMag(1);
-    return steering;
-    //console.log(closestBarriers);
+    desired.setMag(this.maxForce);
+
+
+    this.steering = steering;
   }
 
   this.calculateFitness = function(){
@@ -190,7 +234,25 @@ function Agent(x, y, brain) {
     } else {
       this.fitness = constrain(1 / this.distToEnd,0,1);
 
+      if (this.hitWall) {
+        //this.fitness *= 0;
+      }
+
     }
   }
 
+}
+
+function drawArrow(base, vec, myColor) {
+  push();
+  stroke(myColor);
+  strokeWeight(3);
+  fill(myColor);
+  translate(base.x, base.y);
+  line(0, 0, vec.x, vec.y);
+  rotate(vec.heading());
+  let arrowSize = 7;
+  translate(vec.mag() - arrowSize, 0);
+  triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
+  pop();
 }

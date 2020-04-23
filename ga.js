@@ -5,9 +5,7 @@
 // Neuro-Evolution Flappy Bird
 
 function nextGeneration() {
-  console.log('next generation');
   calculateFitness();
-  console.log('fitness calculated')
   for (let i = 0; i < populationSize; i++) {
     population[i] = pickOne();
   }
@@ -25,7 +23,7 @@ function pickOne() {
   let agent = savedAgents[index];
   let agentBrain = agent.brain;
   let child = new Agent(start.i + scl/2, start.j + scl/2, agentBrain);
-  console.log('mutating child ', child,' got fr0m index ' + index + ' with brain ', agentBrain);
+  //console.log('mutating child ', child,' got fr0m index ' + index + ' with brain ', agentBrain);
   child.mutate();
   return child;
 }

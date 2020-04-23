@@ -13,14 +13,17 @@ let goal;
 let agent;
 let radius;
 let barriers = [];
-let xoff = 0;
-let yoff = 10000;
 let force;
 let population = [];
 let savedAgents = [];
 let populationSize = 100;
 let populationCreated = false;
 let generation = 0;
+
+let agent_lifespan = 500;
+const MUTATION_RATE = 0.5
+
+let speedSlider;
 
 
 function setup() {
@@ -30,7 +33,7 @@ function setup() {
   frameRate(60);
   cols = floor(width / scl);
   rows = floor(height / scl);
-  radius = scl/2 * 0.5;
+  radius = scl/2 * 0.2;
   80
   for (var y = 0; y < rows; y++) {
     for (var x = 0; x < cols; x++) {
@@ -64,11 +67,9 @@ function setup() {
 
 
 function draw() {
-  background(51);
-  // Draw the Grid
-  for (var i = 0; i < grid.length; i++) {
-    grid[i].show();
-  }
+
+
+
 
   // Solve the current grid using the selected search method
   if (solve) {
@@ -105,17 +106,16 @@ function draw() {
     prevSearchMethod = searchMethod;
   }
 
+  ///////// Drawing related
 
-  // AGENT RELATED
+  // Draw the Grid
+  background(51);
 
-  //agent.move(noise(xoff) * width ,noise(yoff) * height);
-  for (agent of population){
-    if (!agent.dead){
-      agent.update();
-    }
-    agent.show();
+  for (var i = 0; i < grid.length; i++) {
+    grid[i].show();
   }
 
+  // Draw the current generation
   if(populationCreated) {
     push();
     fill(255);
@@ -126,20 +126,47 @@ function draw() {
     pop();
   }
 
+  // Draw the agent
+  for (agent of population){
+    agent.show();
+  }
 
-  for (let i = population.length - 1; i>= 0; i--){
-    let agent = population[i];
-    if (agent.dead || agent.finished){
-      savedAgents.push(population.splice(i,1)[0]);
-      //console.log('agent ' + i + ' is dead');
+  // AGENT RELATED
+
+  let cycles = speedSlider.value();
+
+  //for (let n = 0; n < cycles; n++){
+
+    //agent.move(noise(xoff) * width ,noise(yoff) * height);
+    for (agent of population){
+      if (!agent.dead){
+        agent.move(agent.steering);
+        agent.update();
+      }
     }
-  }
 
-  if (population.length == 0 && populationCreated){
-    generation++;
-    nextGeneration();
 
-  }
+
+
+    for (let i = population.length - 1; i>= 0; i--){
+      let agent = population[i];
+      if (agent.dead || agent.finished){
+        savedAgents.push(population.splice(i,1)[0]);
+      }
+    }
+
+    if (population.length == 0 && populationCreated){
+      generation++;
+      agent_lifespan += 20;
+      //primms();
+      nextGeneration();
+
+    }
+  //}
+
+
+
+
 
 
 }
@@ -154,6 +181,7 @@ function mousePressed() {
 }
 
 function createInterface(){
+  speedSlider = createSlider(1, 50, 1);
   radio = createRadio();
   radio.option('Depth First Search');
   radio.option('Breadth First Search');

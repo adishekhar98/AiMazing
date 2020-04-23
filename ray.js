@@ -1,6 +1,7 @@
 function Ray(angle, agent) {
   this.pos = createVector(agent.pos.x, agent.pos.y);
   this.dir = p5.Vector.fromAngle(angle);
+  this.angle = angle;
 
 
   this.update = function() {
@@ -10,6 +11,10 @@ function Ray(angle, agent) {
     // translate(this.pos.x, this.pos.y);
     // line(0,0, this.dir.x * 100, this.dir.y * 100);
     // pop();
+  }
+
+  this.rotate = function(offset){
+    this.dir = p5.Vector.fromAngle(this.angle + offset);
   }
 
   this.cast = function(wall){
