@@ -1,6 +1,9 @@
 /*
-  brian.js is taken from
-  https://github.com/jameshball/MazeAI/blob/master/Brain.pde
+  The brain object serves as the "neural net" for the agent.
+  The direction array stores a series of direction vectors which is how the agent moves.
+
+  Code adpated from the following:
+  https://github.com/jameshball/MazeAI/
 */
 
 
@@ -9,12 +12,12 @@ function Brain(size) {
   this.step = 0;
 
 
+  // Initialise the directions array with random direction vectors
   for (let i = 0; i < size; i++) {
-    let randomAngle = random(2*PI);
-    this.directions[i] = p5.Vector.fromAngle(randomAngle);
+    this.directions[i] = randomDirectionVector();
   }
 
-  // Returns a clone of the current brain, with new random values for any remaining
+  // Returns a clone of the current brain, with new random vectors for new steps
   this.clone = function(){
     let clone = new Brain(stepCount);
     for(let i = 0; i < stepCount; i++){
@@ -22,24 +25,27 @@ function Brain(size) {
         clone.directions[i] = this.directions[i];
       }
       else {
-        let randomAngle = random(2*PI);
-        clone.directions[i] = p5.Vector.fromAngle(randomAngle);
+        clone.directions[i] = randomDirectionVector();
       }
     }
 
     return clone;
   }
 
-  /* Randomly changes 0.1% of the direction vectors in the current brain. */
+  // Change 0.1% of values in the directions array to a new random direction
   this.mutate = function(){
 
     for(let i = 0; i < this.directions.length - 1; i++){
-      let rnd = random(1);
 
-      if (rnd < MUTATION_RATE) {
+      if (random(1) < MUTATION_RATE) {
         let randomAngle = random(2*PI);
-        this.directions[i] = p5.Vector.fromAngle(randomAngle);
+        this.directions[i] = randomDirectionVector();
       }
     }
   }
+}
+
+// Returns a random direction vector
+function randomDirectionVector(){
+  return p5.Vector.fromAngle(random(2*PI));
 }

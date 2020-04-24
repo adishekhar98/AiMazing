@@ -1,59 +1,64 @@
+/*
+  The population class contains an array of all agents
+  It is responsible for measuring the fitness of the agents and running the genetic algorithm
+  Code adapted from:
+  https://github.com/jameshball/MazeAI/
+*/
+
+
 function Population(size){
   this.agents = [];
-  this.fitnessSum;
 
+  // Fill the population with new agents
   for(let i = 0; i < size; i++){
-    this.agents[i] = new Agent();
+    this.agents.push(new Agent());
   }
 
-
+  // Draw all agents in the population
   this.show = function(){
     for(agent of this.agents){
       agent.show();
     }
   }
 
+  // Update all agents in the population
   this.update = function(){
     for(agent of this.agents){
       agent.update();
     }
   }
 
+  // Check if all agents from the current generation are dead
   this.allAgentsDead = function(){
     for(agent of this.agents ){
       if (!agent.dead) {
         return false;
       }
     }
-    console.log('ALL AGENTS DEAD');
     return true;
   }
 
+  // This is the genetic algorithm, it creates a new generation from the best agents of the previous generation
   this.naturalSelection = function(){
-    let newGen = []; // size = this.agents.length
+    let newGen = [];
 
+    // Saves the best agent from the previous generation
     let prevBest = this.bestAgent().getChild();
     prevBest.isBest = true;
-    console.log(prevBest);
-    console.log('prev best fitness ' + this.bestAgent().fitness);
 
-    //newGen[this.agents.length - 1] = prevBest;
+    // Fill the new generation with children of the best agents from the current gen
     for(let i = 0; i < this.agents.length - 1; i++){
-      let parent = this.selectParent();
-
-      newGen[i] = parent.getChild();
+      newGen.push(this.selectParent().getChild());
     }
-
     newGen.push(prevBest);
-
     this.agents = newGen;
+
+    // Increment the generation and step count. To encourage exploration, each generation can move a further distance than its parents
     generation++;
     stepCount = stepCount + 20;
-    if (stepCount > 2500) {
-      stepCount = 2500;
-    }
   }
 
+  // Calculates the sum of all the fitnesses for agents in the current generation
   this.calculateFitnessSum = function(){
     let fitSum = 0;
 
@@ -63,6 +68,7 @@ function Population(size){
     return fitSum
   }
 
+  // Selects a parent agents from the current generation
   this.selectParent = function() {
     let rnd = random(this.calculateFitnessSum());
 
@@ -77,7 +83,6 @@ function Population(size){
         return parent;
       }
     }
-
     if (!parent){
       let rnd = floor(random(this.agents.length));
       parent = this.agents[rnd];
@@ -85,6 +90,7 @@ function Population(size){
     return parent;
   }
 
+  // Mutates all agents
   this.mutate = function(){
     for(agent of this.agents){
       if (!agent.isBest){
@@ -93,6 +99,7 @@ function Population(size){
     }
   }
 
+  // Gets the agent with the best fitness from the current generation
   this.bestAgent = function(){
     let max = 0;
     let bestAgent;
@@ -109,59 +116,4 @@ function Population(size){
     }
     return bestAgent;
   }
-
-//   int goalReachTotal() {
-//     int goalReachTotal = 0;
-//
-//     for(int i = 0; i < dots.length; i++){
-//       if (dots[i].reachedGoal){
-//         goalReachTotal++;
-//       }
-//     }
-//
-//     return goalReachTotal;
-//   }
-//
-//   void processGraphs() {
-//     Datapoint min = new Datapoint(true);
-//     Datapoint max = new Datapoint(true);
-//     Float total = 0.0;
-//
-//     for(int i = 0; i < dots.length; i++){
-//       if (dots[i].reachedGoal){
-//         if (min.isEmpty) {
-//           min.data = (float)dots[i].brain.step;
-//           min.isEmpty = false;
-//         }
-//         else if (dots[i].brain.step < min.data) {
-//           min.data = (float)dots[i].brain.step;
-//         }
-//       }
-//
-//       if (max.isEmpty) {
-//         max.data = dots[i].fitness;
-//         max.isEmpty = false;
-//       }
-//       else if (dots[i].fitness > max.data) {
-//         max.data = dots[i].fitness;
-//       }
-//
-//       total += dots[i].fitness;
-//     }
-//
-//     avgFitness.add(new Datapoint((total)/dots.length, false));
-//
-//     fewestSteps.add(min);
-//
-//     maxFitness.add(max);
-//
-//     //System.out.println((total)/dots.length);
-//   }
-//
-//   void nextGoal() {
-//     if (goalReachTotal() > 50 && maze.goals.currentGoal + 1 < maze.goals.locations.size()) {
-//       maze.goals.currentGoal++;
-//     }
-//   }
-// }
 }

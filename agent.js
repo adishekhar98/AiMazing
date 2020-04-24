@@ -26,7 +26,7 @@ function Agent(brain) {
     if(this.isBest){
       push();
       fill(0, 255, 0, 100);
-      strokeWeight(2)
+      stroke(0, 255, 0);
       ellipse(this.pos.x, this.pos.y, this.rad * 2);
       pop();
     } else {
@@ -83,7 +83,7 @@ function Agent(brain) {
         if (cell.state == 'f') {
           if (this.intersectsCell(cell)){
             this.finished = true;
-            console.log('FINISHED!');
+            goalReached = true; 
             this.fitness = 1;
             this.dead = true;
           }

@@ -1,90 +1,166 @@
-// these are going to be filled with the cell objects themselves
-
+/*
+  A* search code adapted from the following:
+  https://github.com/CodingTrain/website/tree/master/CodingChallenges/CC_051_astar/P5
+*/
 
 var openSet = [];
 var closedSet = [];
 
 
-//openSet.push(start);
 
 function aStarStep() {
+  /*
+    A* search uses the following formula to evaluate nodes:
+      f(n) = g(n) + h(n)
+    Where f(n) is the 'cost' of each node,
+      g(n) is the cost associated from getting from the start node to the current node
+      h(n) is a heuristic to estimate the cost of getting from the current node to the end.
+  */
+
+
+  // Initialise the g and f values for the start. Since g(start) = 0, f(start) = h(start)
   start.g = 0;
-  start.f = heuristic(start,end);
+  start.f = heuristic(start, end);
 
 
-
+  // As long as there are nodes to evaluate, run the the algorithm
   if (openSet.length > 0) {
-    //var v = stack.pop();
-    //var node = grid[v];
 
-    var lowestFIndex = 0
-    for (var i = 0; i < openSet.length; i++){
-      if (openSet[i].f < openSet[lowestFIndex].f){
+    // Calcualates which node in the open set has the lowest f-cost, evaluating it first
+    let lowestFIndex = 0
+    for (let i = 0; i < openSet.length; i++) {
+      if (openSet[i].f < openSet[lowestFIndex].f) {
         lowestFIndex = i;
       }
     }
 
 
-
+    // Store the lowest f-cost node in variables, as a cell object and as an index in the grid
     var node = openSet[lowestFIndex];
     var v = node.j * rows + node.i;
 
-    //if the current node is the finish, then print "finished" and return
+    // If the current node is the end, then print "finished" and return
     if (node.state == 'f') {
       console.log('finished');
       solve = false;
-      for (i = 0; i < shortestPath(node).length; i++){
+      // Calculate the shortest path
+      for (i = 0; i < shortestPath(node).length; i++) {
         shortestPath(node)[i].inpath = true;
       }
 
     }
 
+    // Remove the current node from the open set and add it to the closed set, mark it as visited
     popElt(openSet, node);
     node.visited = true;
     closedSet.push(node);
 
-    for (var i = 0;  i < adjacent(v).length; i++ ){
-      var neighbour = grid[adjacent(v)[i]];
+    // Loop through all neighbouring cells of the current node
+    for (neighbourIndex of adjacent(v)) {
+      let neighbour = grid[neighbourIndex];
       neighbour.queued = true;
 
-      if(!closedSet.includes(neighbour)){
-        var tempG = node.g + 1;
-        //var tempG = heuristic(neighbour,current);
+      // If the neighbour hasn't already been evaluated, evaluate it's g-cost
+      if (!closedSet.includes(neighbour)) {
 
+        // Each neighbour is a distance of 1 from its parent node
+        let tentativeG = node.g + 1;
 
-        var newPath = false;
-        if(openSet.includes(neighbour)) {
-          if (tempG < neighbour.g) {
-            neighbour.g = tempG;
+        // Determine the lowest g-cost to the given neighbour
+        let newPath = false;
+        if (openSet.includes(neighbour)) {
+          if (tentativeG < neighbour.g) {
+            neighbour.g = tentativeG;
             newPath = true;
           }
         } else {
-          neighbour.g = tempG;
+          neighbour.g = tentativeG;
           newPath = true;
           openSet.push(neighbour);
         }
-      
-        if(newPath){
+
+        // If a new path to the neighbour is found, update its parent and calulcate its cost
+        if (newPath) {
           neighbour.parent = node;
-          neighbour.h = heuristic(neighbour,end);
+          neighbour.h = heuristic(neighbour, end);
           neighbour.f = neighbour.g + neighbour.h;
         }
 
       }
     }
+  } else {
+    solve = false;
+  }
 
-    // if node has not been visited, visit it, and add adjacent nodes to the queue
-    // if (!node.visited) {
-    //   node.visited = true;
-    //
-    //   for (i = 0; i < adjacent(v).length; i++) {
-    //     stack.push(adjacent(v)[i]);
-    //     grid[adjacent(v)[i]].parent = node;
-    //     grid[adjacent(v)[i]].queued = true;
-    //   }
-    // }
+}
+
+function bStarStep() {
+  /*
+    Best First search (also known as B*) is a simpler version of A*, the formula being:
+      f(n) = h(n)
+    Here the g-cost is ommited from the formula, using only the hueristic function to evaluate cells
+  */
 
 
+  // Initialise the f value for the start
+  start.f = heuristic(start, end);
+
+
+  // As long as there are nodes to evaluate, run the the algorithm
+  if (openSet.length > 0) {
+
+    // Calcualates which node in the open set has the lowest f-cost, evaluating it first
+    let lowestFIndex = 0
+    for (let i = 0; i < openSet.length; i++) {
+      if (openSet[i].f < openSet[lowestFIndex].f) {
+        lowestFIndex = i;
+      }
+    }
+
+
+    // Store the lowest f-cost node in variables, as a cell object and as an index in the grid
+    var node = openSet[lowestFIndex];
+    var v = node.j * rows + node.i;
+
+    // If the current node is the end, then print "finished" and return
+    if (node.state == 'f') {
+      console.log('finished');
+      solve = false;
+      // Calculate the shortest path
+      for (i = 0; i < shortestPath(node).length; i++) {
+        shortestPath(node)[i].inpath = true;
+      }
+
+    }
+
+    // Remove the current node from the open set and add it to the closed set, mark it as visited
+    popElt(openSet, node);
+    node.visited = true;
+    closedSet.push(node);
+
+    // Loop through all neighbouring cells of the current node
+    for (neighbourIndex of adjacent(v)) {
+      let neighbour = grid[neighbourIndex];
+      neighbour.queued = true;
+
+      // If the node is not in the open or closed set, add it to the open set
+      if (!closedSet.includes(neighbour)) {
+        // IF the node
+        let newPath = false;
+        if (!openSet.includes(neighbour)) {
+          newPath = true;
+          openSet.push(neighbour);
+        }
+
+        // If a new path to the neighbour is found, update its parent and calulcate its cost
+        if (newPath) {
+          neighbour.parent = node;
+          neighbour.h = heuristic(neighbour, end);
+          neighbour.f = neighbour.h;
+        }
+
+      }
+    }
   } else {
     solve = false;
   }
@@ -93,16 +169,16 @@ function aStarStep() {
 
 
 
+// Reset current A* and B* parameters
 function aStarReset() {
   openSet = [];
   closedSet = [];
   openSet.push(start);
-
 }
 
 //custom function to pop a given element from a given array
 function popElt(arr, elt) {
-  for (var i = arr.length-1; i>= 0; i--){
+  for (var i = arr.length - 1; i >= 0; i--) {
     if (arr[i] == elt) {
       arr.splice(i, 1);
       //return arr[i];
@@ -110,16 +186,8 @@ function popElt(arr, elt) {
   }
 }
 
-function heuristic(a,b){
-  // Uses Euclidian Distance
-  //var d = dist(a.i,a.j,b.i,b.j);
-
+// The heuristic used is the Euclidian distance the given cell to the end
+function heuristic(a, b) {
   var d = abs(a.i - b.i) + abs(a.j - b.j);
   return d;
-}
-
-function dfsReset() {
-  stack = [];
-  stack.push(0);
-
 }
