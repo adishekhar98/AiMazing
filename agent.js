@@ -1,132 +1,109 @@
-function Agent(x, y, brain) {
-  this.pos = createVector(x, y);
-  this.vel = createVector();
-  this.acc = createVector();
-  this.rad = radius;
+function Agent(brain) {
+  this.pos = createVector(start.x + scl / 2, start.y + scl /2);
+  this.vel = createVector(0,0);
+  this.acc = createVector(0,0);
+  this.rad = agent_radius;
   this.intersecting = false;
-  this.rays = [];
-  this.sightRange = scl * 5;
-  this.distToEnd = dist(this.pos.x, this.pos.y, end.x + scl / 2, end.y + scl / 2);
   this.dead = false;
   this.finished = false;
-  this.brain;
-  this.score = 0;
+  this.isBest = false;
   this.fitness = 0;
-  this.newBrain = false;
+  this.hitWall = false;
 
-  this.rays = [];
-  for (var i = 0; i < 360; i += 30) {
-    this.rays.push(new Ray(radians(i), this));
+  // IF the agent is created with a brain, then use that brain.
+  // Otherwise, create a new brain.
+
+  if (brain){
+    this.brain = brain;
+  } else {
+    this.brain = new Brain(stepCount);
   }
 
-  if (brain) {
-    this.newBrain = false;
-    console.log('newBrain  = '+ this.newBrain);
-    this.brain = brain.copy();
-  } else if (!brain) {
-    this.newBrain = true;
-    console.log('newBrain  = '+ this.newBrain);
-    this.brain = new NeuralNetwork(this.rays.length, this.rays.length, 1);
-  }
+
+
 
   this.show = function() {
-    fill(255, 255, 255, 100);
-    ellipse(this.pos.x, this.pos.y, this.rad * 2);
-
-    // for (ray of this.rays) {
-    //   ray.show();
-    // }
-
-  }
-
-  // this.createRays = function() {
-  //   this.rays = [];
-  //   for (var i = 0; i < 360; i += 30) {
-  //     this.rays.push(new Ray(radians(i)));
-  //   }
-  // }
-
-  // this.createNN = function(){
-  //   if (!this.newBrain){
-  //     console.log('created with existing brain ', brain, ', copying brain...');
-  //     this.brain = brain.copy();
-  //   } else{
-  //     console.log('creating new brain for ', this);
-  //     this.brain = new NeuralNetwork(this.rays.length, this.rays.length, 1);
-  //   }
-  // }
-
-  this.mutate = function(){
-    console.log('agent.mutate function called');
-    console.log('newBrain is ' + this.newBrain, ' ... ', this.brain);
-    this.brain.mutate(0.1);
-  }
-
-  this.dispose = function(){
-    this.brain.dispose();
-  }
-
-  this.update = function() {
-    //getBarriers();
-    for (ray of this.rays){
-      ray.update();
-    }
-    if (!this.dead){
-    this.move(this.castRays());
+    if(this.isBest){
+      push();
+      fill(0, 255, 0, 100);
+      stroke(0, 255, 0);
+      ellipse(this.pos.x, this.pos.y, this.rad * 2);
+      pop();
+    } else {
+      push();
+      strokeWeight(2);
+      fill(255, 255, 255, 100);
+      ellipse(this.pos.x, this.pos.y, this.rad * 2);
+      pop();
     }
 
-    // for (ray of this.rays){
-    //   ray.show();
-    // }
+  }
 
+  this.move = function() {
+    if (this.brain.step < this.brain.directions.length){
+      this.acc = this.brain.directions[this.brain.step];
+      this.brain.step++;
+    } else {
+      this.dead = true;
 
-    // if (this.checkCollisions()) {
-    //   this.pos.set(start.i + scl / 2, start.j + scl / 2);
-    //   this.vel.set(0, 0);
-    // }
+      this.calculateFitness();
+    }
 
 
     this.vel.add(this.acc);
+    this.vel.limit(MAX_SPEED);
     this.pos.add(this.vel);
-    this.acc.mult(0);
-    this.distToEnd = dist(this.pos.x, this.pos.y, end.x + scl / 2, end.y + scl / 2);
   }
 
-  this.move = function(force) {
-    this.acc.add(force);
-  }
+  this.update = function(){
 
-  this.checkCollisions = function() {
-    if (this.pos.x - this.rad <= 0 || this.pos.x + this.rad >= width || this.pos.y - this.rad <= 0 || this.pos.y + this.rad >= height) {
-      console.log('intersection!');
-      return true;
-      this.intersecting = true;
+    if (this.isColliding()){
+      this.calculateFitness();
+      this.hitWall = true;
+      this.dead = true;
     }
 
-    for (var i = 0; i < grid.length; i++) {
-      var cell = grid[i];
+    if (!this.dead && !this.finished && !this.hitWall){
+      this.move();
+      this.calculateFitness();
+    } else if (this.finished){
+      this.calculateFitness();
+    }
+  }
 
-      if (cell.state == 'f') {
-        push();
-        stroke(0, 255, 0);
-        line(this.pos.x, this.pos.y, cell.x + scl / 2, cell.y + scl / 2);
-        pop();
-      }
-      if (cell.state == 1) {
-        push();
-        stroke(255, 0, 0);
-        //line(this.pos.x, this.pos.y, cell.x + scl / 2, cell.y + scl / 2);
-        pop();
-        if (this.intersection(cell)) {
-          return true;
-          this.intersecting = true;
+
+  this.isColliding = function() {
+    if (this.pos.x - this.rad <= 0 || this.pos.x + this.rad >= width || this.pos.y - this.rad <= 0 || this.pos.y + this.rad >= height) {
+
+      return true;
+      this.intersecting = true;
+    } else {
+      for (cell of grid) {
+
+        if (cell.state == 'f') {
+          if (this.intersectsCell(cell)){
+            this.finished = true;
+            goalReached = true; 
+            this.fitness = 1;
+            this.dead = true;
+          }
+
+        } else if (cell.state == 1) {
+          // push();
+          // stroke(255, 0, 0);
+          // line(this.pos.x, this.pos.y, cell.x + scl / 2, cell.y + scl / 2);
+          // pop();
+          if (this.intersectsCell(cell)) {
+            return true;
+            this.intersecting = true;
+          }
         }
       }
     }
     return false;
   }
 
-  this.intersection = function(other) {
+  this.intersectsCell = function(other) {
     if (this.pos.x + this.rad > other.x &&
       this.pos.y + this.rad > other.y &&
       this.pos.x - this.rad < other.x + scl &&
@@ -136,61 +113,23 @@ function Agent(x, y, brain) {
     }
   }
 
-  this.castRays = function() {
-    this.inputs = [];
-    let closestBarriers = [];
-
-    for (let ray of this.rays) {
-      let closest = null;
-      let record = this.sightRange;
-      for (let barrier of barriers) {
-        let pt = ray.cast(barrier);
-        if (pt) {
-          let d = p5.Vector.dist(this.pos, pt);
-          if (d < record) {
-            record = d;
-            closest = pt;
-          }
-
-          if (record - this.rad <= 0  ) {
-            this.dead = true;
-          }
-
-          if (this.distToEnd < this.rad * 2) {
-            this.finished = true;
-          }
-        }
-      }
-      if (closest) {
-        push();
-        stroke(255, 0 , 0);
-        //translate(this.pos.x,this.pos.y);
-        //line(ray.pos.x, ray.pos.y , closest.x, closest.y);
-
-        pop();
-      }
-
-      this.inputs.push( map(record, 0, this.sightRange, 1, 0));
 
 
-    }
-    let output = this.brain.predict(this.inputs);
-    let angle = map(output[0], 0, 1, 0, TWO_PI);
-    let desired = p5.Vector.fromAngle(angle);
-
-    let steering = desired.sub(this.vel);
-    steering.setMag(1);
-    return steering;
-    //console.log(closestBarriers);
-  }
-
+  /* This is the fitness function for this algorithm. It uses the distance to the goal,
+   along with the speed at which it reached the goal. */
   this.calculateFitness = function(){
+    let distToGoal = dist(this.pos.x, this.pos.y, end.x + scl /2, end.y + scl /2);
     if (this.finished){
       this.fitness = 1;
+    } else if(this.hitWall){
+      this.fitness = 0;
     } else {
-      this.fitness = constrain(1 / this.distToEnd,0,1);
-
+      this.fitness = 1.0/(distToGoal * distToGoal + pow(this.brain.step, 2));
     }
   }
 
+  this.getChild = function(){
+    let child = new Agent(this.brain.clone());
+    return child;
+  }
 }
