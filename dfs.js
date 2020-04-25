@@ -12,6 +12,7 @@ function dfsStep() {
 
     //if the current node is the finish, then print "finished" and return
     if (node.state == 'f') {
+      node.inpath = true;
       console.log('finished');
       solve = false;
       for (i = 0; i < shortestPath(node).length; i++){

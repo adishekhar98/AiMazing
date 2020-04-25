@@ -39,7 +39,7 @@ function Population(size){
   }
 
   // This is the genetic algorithm, it creates a new generation from the best agents of the previous generation
-  this.naturalSelection = function(){
+  this.geneticAlgorithm = function(){
     let newGen = [];
 
     // Saves the best agent from the previous generation
@@ -53,9 +53,14 @@ function Population(size){
     newGen.push(prevBest);
     this.agents = newGen;
 
+    // Mutate the agents of the generation to produce potential improvements 
+    this.mutate();
+
     // Increment the generation and step count. To encourage exploration, each generation can move a further distance than its parents
     generation++;
     stepCount = stepCount + 20;
+
+
   }
 
   // Calculates the sum of all the fitnesses for agents in the current generation

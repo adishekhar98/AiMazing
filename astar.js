@@ -41,6 +41,7 @@ function aStarStep() {
 
     // If the current node is the end, then print "finished" and return
     if (node.state == 'f') {
+      node.inpath = true;
       console.log('finished');
       solve = false;
       // Calculate the shortest path
@@ -124,6 +125,7 @@ function bStarStep() {
 
     // If the current node is the end, then print "finished" and return
     if (node.state == 'f') {
+      node.inpath = true;
       console.log('finished');
       solve = false;
       // Calculate the shortest path

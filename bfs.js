@@ -7,6 +7,7 @@ function bfsStep() {
     var v = queue.shift();
     var node = grid[v];
     if (node.state == 'f') {
+      node.inpath = true;
       console.log('finished');
       solve = false;
       for (i = 0; i < shortestPath(node).length; i++){

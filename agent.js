@@ -1,7 +1,7 @@
 function Agent(brain) {
-  this.pos = createVector(start.x + scl / 2, start.y + scl /2);
-  this.vel = createVector(0,0);
-  this.acc = createVector(0,0);
+  this.pos = createVector(start.x + scl / 2, start.y + scl / 2);
+  this.vel = createVector(0, 0);
+  this.acc = createVector(0, 0);
   this.rad = agent_radius;
   this.intersecting = false;
   this.dead = false;
@@ -13,7 +13,7 @@ function Agent(brain) {
   // IF the agent is created with a brain, then use that brain.
   // Otherwise, create a new brain.
 
-  if (brain){
+  if (brain) {
     this.brain = brain;
   } else {
     this.brain = new Brain(stepCount);
@@ -23,7 +23,7 @@ function Agent(brain) {
 
 
   this.show = function() {
-    if(this.isBest){
+    if (this.isBest) {
       push();
       fill(0, 255, 0, 100);
       stroke(0, 255, 0);
@@ -40,7 +40,7 @@ function Agent(brain) {
   }
 
   this.move = function() {
-    if (this.brain.step < this.brain.directions.length){
+    if (this.brain.step < this.brain.directions.length) {
       this.acc = this.brain.directions[this.brain.step];
       this.brain.step++;
     } else {
@@ -55,18 +55,18 @@ function Agent(brain) {
     this.pos.add(this.vel);
   }
 
-  this.update = function(){
+  this.update = function() {
 
-    if (this.isColliding()){
+    if (this.isColliding()) {
       this.calculateFitness();
       this.hitWall = true;
       this.dead = true;
     }
 
-    if (!this.dead && !this.finished && !this.hitWall){
+    if (!this.dead && !this.finished && !this.hitWall) {
       this.move();
       this.calculateFitness();
-    } else if (this.finished){
+    } else if (this.finished) {
       this.calculateFitness();
     }
   }
@@ -81,9 +81,9 @@ function Agent(brain) {
       for (cell of grid) {
 
         if (cell.state == 'f') {
-          if (this.intersectsCell(cell)){
+          if (this.intersectsCell(cell)) {
             this.finished = true;
-            goalReached = true; 
+            goalReached = true;
             this.fitness = 1;
             this.dead = true;
           }
@@ -117,18 +117,18 @@ function Agent(brain) {
 
   /* This is the fitness function for this algorithm. It uses the distance to the goal,
    along with the speed at which it reached the goal. */
-  this.calculateFitness = function(){
-    let distToGoal = dist(this.pos.x, this.pos.y, end.x + scl /2, end.y + scl /2);
-    if (this.finished){
+  this.calculateFitness = function() {
+    let distToGoal = dist(this.pos.x, this.pos.y, end.x + scl / 2, end.y + scl / 2);
+    if (this.finished) {
       this.fitness = 1;
-    } else if(this.hitWall){
-      this.fitness = 0;
+    } else if (this.hitWall) {
+      this.fitness = 0.0000001;
     } else {
-      this.fitness = 1.0/(distToGoal * distToGoal + pow(this.brain.step, 2));
+      this.fitness = 1.0 / (distToGoal * distToGoal + pow(this.brain.step, 2));
     }
   }
 
-  this.getChild = function(){
+  this.getChild = function() {
     let child = new Agent(this.brain.clone());
     return child;
   }
