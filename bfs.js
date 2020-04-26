@@ -2,11 +2,13 @@ var queue = [];
 queue.push(0)
 
 function bfsStep() {
+  stepsTaken++
 
   if (queue.length > 0) {
     var v = queue.shift();
     var node = grid[v];
     if (node.state == 'f') {
+      solutionFound = true;
       node.inpath = true;
       console.log('finished');
       solve = false;
@@ -29,6 +31,9 @@ function bfsStep() {
 
 
   } else {
+    solutionFound = false;
+    noSolution = true;
+    shortestPathLen = 0;
     solve = false;
 
   }
@@ -38,6 +43,11 @@ function bfsStep() {
 
 
 function bfsReset() {
+  showSolveMetrics = false;
+  solutionFound = false;
+  noSolution = false;
+  stepsTaken = 0;
+  shortestPathLen = 0;
   queue = [];
   queue.push(0);
 

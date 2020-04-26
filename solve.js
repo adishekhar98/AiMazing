@@ -48,6 +48,7 @@ function doPopulationStep(){
 
 // If the solve button is pressed, run the appropriate solve method
 function solveButtonPressed() {
+  showSolveMetrics = true;
   for (var i = 0; i < grid.length; i++) {
     grid[i].resetSearch();
   }

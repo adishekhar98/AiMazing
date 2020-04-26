@@ -8,6 +8,11 @@ let start;
 let end;
 let radio;
 let solve = false;
+let solutionFound = false;
+let noSolution = false; 
+let stepsTaken = 0;
+let shortestPathLen = 0;
+let showSolveMetrics = false;
 let speed = 20;
 let goal;
 let population;
@@ -72,6 +77,10 @@ function draw() {
     population.show();
     drawTextGA();
   }
+
+  if(showSolveMetrics){
+    drawTextSolve();
+  }
 }
 
 
@@ -95,6 +104,7 @@ function invert() {
 
 
 function resetButtonPressed() {
+  showSolveMetrics = false;
   for (cell of grid) {
     cell.resetTiles();
   }

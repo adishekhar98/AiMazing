@@ -3,6 +3,7 @@ stack.push(0)
 
 
 function dfsStep() {
+  stepsTaken++
 
 
 
@@ -12,6 +13,7 @@ function dfsStep() {
 
     //if the current node is the finish, then print "finished" and return
     if (node.state == 'f') {
+      solutionFound = true;
       node.inpath = true;
       console.log('finished');
       solve = false;
@@ -32,9 +34,10 @@ function dfsStep() {
       }
     }
 
-
-    // I WANT TO UPDATE THE CANVAS HERE
   } else {
+    solutionFound = false;
+    noSolution = true;
+    shortestPathLen = 0;
     solve = false;
   }
 
@@ -42,6 +45,11 @@ function dfsStep() {
 
 
 function dfsReset() {
+  showSolveMetrics = false;
+  solutionFound = false;
+  noSolution = false;
+  stepsTaken = 0;
+  shortestPathLen = 0;
   stack = [];
   stack.push(0);
 

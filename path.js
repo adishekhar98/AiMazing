@@ -1,9 +1,9 @@
 function shortestPath(node) {
+  shortestPathLen = 0; 
   let path = [];
   let startnode;
 
   while (node !== null) {
-
     node = getParent(node)
     path.push(node);
 
@@ -13,6 +13,7 @@ function shortestPath(node) {
 }
 
 function getParent(node) {
+  shortestPathLen++;
   var parent = node.parent
   return parent;
 }

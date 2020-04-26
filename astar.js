@@ -18,6 +18,8 @@ function aStarStep() {
   */
 
 
+  stepsTaken++
+
   // Initialise the g and f values for the start. Since g(start) = 0, f(start) = h(start)
   start.g = 0;
   start.f = heuristic(start, end);
@@ -41,6 +43,7 @@ function aStarStep() {
 
     // If the current node is the end, then print "finished" and return
     if (node.state == 'f') {
+      solutionFound = true;
       node.inpath = true;
       console.log('finished');
       solve = false;
@@ -90,6 +93,9 @@ function aStarStep() {
       }
     }
   } else {
+    solutionFound = false;
+    noSolution = true;
+    shortestPathLen = 0;
     solve = false;
   }
 
@@ -102,6 +108,7 @@ function bStarStep() {
     Here the g-cost is ommited from the formula, using only the hueristic function to evaluate cells
   */
 
+  stepsTaken++
 
   // Initialise the f value for the start
   start.f = heuristic(start, end);
@@ -125,6 +132,7 @@ function bStarStep() {
 
     // If the current node is the end, then print "finished" and return
     if (node.state == 'f') {
+      solutionFound = true;
       node.inpath = true;
       console.log('finished');
       solve = false;
@@ -164,6 +172,9 @@ function bStarStep() {
       }
     }
   } else {
+    solutionFound = false;
+    noSolution = true;
+    shortestPathLen = 0;
     solve = false;
   }
 
@@ -173,6 +184,11 @@ function bStarStep() {
 
 // Reset current A* and B* parameters
 function aStarReset() {
+  showSolveMetrics = false;
+  solutionFound = false;
+  noSolution = false;
+  stepsTaken = 0;
+  shortestPathLen = 0;
   openSet = [];
   closedSet = [];
   openSet.push(start);

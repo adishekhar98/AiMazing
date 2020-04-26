@@ -86,6 +86,29 @@ function drawTextGA(){
   pop();
 }
 
+function drawTextSolve(){
+  if (solutionFound){
+
+  }
+  push();
+  fill(255,200);
+  stroke(0,200);
+  strokeWeight(5);
+  textSize(15);
+  text('Steps Taken: ' + stepsTaken , 10, height - 40);
+  if (solutionFound){
+    fill(0,255,0,200);
+    text('Shortest Path Length: ' + shortestPathLen, 10, height - 15);
+  } else if (noSolution){
+    fill(255,0,0,200);
+    text('No solution', 10, height - 15);
+  } else{
+    fill(255,200);
+    text('Solving...', 10, height - 15);
+  }
+  pop();
+}
+
 function parseSpeedValue(){
   cycles = speedSlider.value();
   if (speedSlider.value() <= 10){
