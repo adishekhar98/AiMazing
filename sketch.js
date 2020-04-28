@@ -9,7 +9,7 @@ let end;
 let radio;
 let solve = false;
 let solutionFound = false;
-let noSolution = false; 
+let noSolution = false;
 let stepsTaken = 0;
 let shortestPathLen = 0;
 let showSolveMetrics = false;
@@ -78,7 +78,7 @@ function draw() {
     drawTextGA();
   }
 
-  if(showSolveMetrics){
+  if(showSolveMetrics and !populationCreated){
     drawTextSolve();
   }
 }

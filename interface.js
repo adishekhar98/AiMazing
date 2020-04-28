@@ -10,7 +10,7 @@ function createInterface(){
   radio = createRadio();
   radio.option('Depth First Search');
   radio.option('Breadth First Search');
-  radio.option('Best First Search');
+  radio.option('Greedy Best First Search');
   radio.option('A* Search');
   radio.option('Genetic Algorithm');
   radio.value('Depth First Search');
