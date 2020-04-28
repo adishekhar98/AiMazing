@@ -16,8 +16,9 @@ function Agent(x, y, brain) {
   this.hitWall = false;
   this.goalVector = createVector(end.x, end.y);
   this.maxForce = 1;
-  this.maxSpeed = 4;
+  this.maxSpeed = 2;
   this.steering;
+  this.isBest = false;
 
   this.rays = [];
   for (var i = 0; i < 360; i += 30) {
@@ -27,12 +28,21 @@ function Agent(x, y, brain) {
   if (brain) {
     this.brain = brain.copy();
   } else if (!brain) {
-    this.brain = new NeuralNetwork(this.rays.length, this.rays.length + 3, 1);
+    this.brain = new NeuralNetwork(this.rays.length, this.rays.length, 1);
   }
 
   this.show = function() {
-    fill(255, 255, 255, 100);
+    if (!this.isBest){
+      push();
+      fill(255, 255, 255, 100);
+      ellipse(this.pos.x, this.pos.y, this.rad * 2);
+      pop();
+    } else {
+    push();
+    fill(0, 255, 0, 100);
     ellipse(this.pos.x, this.pos.y, this.rad * 2);
+    pop();
+    }
 
 
     //drawArrow(this.pos, this.goalVector, 'blue');
@@ -92,9 +102,9 @@ function Agent(x, y, brain) {
     //   this.vel.set(0, 0);
     // }
 
-
+    this.acc = this.steering;
     this.vel.add(this.acc);
-    this.vel.limit(this.maxSpeed);
+    this.vel.limit(3);
     this.pos.add(this.vel);
     //this.acc.mult(0);
     this.distToEnd = dist(this.pos.x, this.pos.y, end.x + scl / 2, end.y + scl / 2);
@@ -105,7 +115,7 @@ function Agent(x, y, brain) {
   }
 
   this.move = function(force) {
-    this.acc.add(force);
+    this.acc = force;
   }
 
   this.checkCollisions = function() {
@@ -164,7 +174,7 @@ function Agent(x, y, brain) {
             closest = pt;
           }
 
-          if (record - this.rad <= 0  ) {
+          if (record - this.rad <= 2  ) {
             this.hitWall = true;
             this.dead = true;
           }
@@ -175,11 +185,11 @@ function Agent(x, y, brain) {
         }
       }
       if (closest) {
-        //push();
-        //stroke(255, 0 , 0);
-        //line(ray.pos.x, ray.pos.y , closest.x, closest.y);
-
-        //pop();
+        // push();
+        // stroke(255, 0 , 0);
+        // line(ray.pos.x, ray.pos.y , closest.x, closest.y);
+        //
+        // pop();
       }
 
       // Push each ray distance into the input for the NN
@@ -215,44 +225,59 @@ function Agent(x, y, brain) {
     //let output_x = map(output[0], 0, 1, -1, 1);
     //let output_y = map(output[1], 0, 1, -1, 1);
 
-    let angle = map(output[0], 0, 1, 0, TWO_PI);
+    let angle = map(output[0], 0, 1, -PI, PI);
     //angle += this.vel.heading();
     let desired = p5.Vector.fromAngle(angle);
-
+    desired.normalize();
     //let desired = createVector(output_x, output_y);
-
-    let steering = desired.sub(this.vel);
-    desired.setMag(this.maxForce);
-
-
-    this.steering = steering;
+    this.steering = desired;
+    // let steering = desired.sub(this.vel);
+    // desired.setMag(this.maxForce);
+    //
+    //
+    // this.steering = steering;
   }
 
   this.calculateFitness = function(){
+    let maxlen = rows + cols;
+    let mappedfit = map(aStarAgent(this.getClosetCell()), 0, maxlen, 0, 500);
+    console.log(mappedfit);
     if (this.finished){
       this.fitness = 1;
     } else {
-      this.fitness = constrain(1 / this.distToEnd,0,1);
+
+      this.fitness = 1.0 / (mappedfit * mappedfit + pow(this.lifespan, 2));
+
 
       if (this.hitWall) {
-        //this.fitness *= 0;
+        this.fitness = 0.0000001;
+
       }
 
     }
+    console.log('PRINTING THIS FITNESS ' + this.fitness)
   }
 
-}
+  this.getClosetCell = function(){
+    let closest;
+    let record = Infinity;
+    let distancetocell;
 
-function drawArrow(base, vec, myColor) {
-  push();
-  stroke(myColor);
-  strokeWeight(3);
-  fill(myColor);
-  translate(base.x, base.y);
-  line(0, 0, vec.x, vec.y);
-  rotate(vec.heading());
-  let arrowSize = 7;
-  translate(vec.mag() - arrowSize, 0);
-  triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
-  pop();
+    for (cell of grid){
+
+      if(cell.state == 0 || cell.state == 's'){
+        distancetocell = dist(this.pos.x, this.pos.y, cell.x , cell.y);
+
+
+        if (distancetocell < record){
+          record = distancetocell;
+          //console.log('record dist is ' + record);
+          closest = cell;
+        }
+      }
+    }
+    return closest;
+  }
+
+
 }

@@ -4,6 +4,7 @@
 
 // Neuro-Evolution Flappy Bird
 
+
 function nextGeneration() {
   calculateFitness();
   for (let i = 0; i < populationSize; i++) {
@@ -29,9 +30,13 @@ function pickOne() {
 }
 
 function calculateFitness() {
-
+let maxFit = 0;
   for (let agent of savedAgents) {
     agent.calculateFitness();
+    if (agent.fitness >= maxFit){
+      bestAgent = agent;
+      maxFit = agent.fitness;
+    }
   }
 
   let sum = 0;
@@ -41,4 +46,5 @@ function calculateFitness() {
   for (let agent of savedAgents) {
     agent.fitness = agent.fitness / sum;
   }
+  bestAgent.isBest = true;
 }

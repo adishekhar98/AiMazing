@@ -16,12 +16,12 @@ let barriers = [];
 let force;
 let population = [];
 let savedAgents = [];
-let populationSize = 100;
+let populationSize = 50;
 let populationCreated = false;
 let generation = 0;
 
-let agent_lifespan = 500;
-const MUTATION_RATE = 0.5
+let agent_lifespan = 10;
+const MUTATION_RATE = 0.5;
 
 let speedSlider;
 
@@ -157,7 +157,7 @@ function draw() {
 
     if (population.length == 0 && populationCreated){
       generation++;
-      agent_lifespan += 20;
+      agent_lifespan += 10;
       //primms();
       nextGeneration();
 

@@ -97,4 +97,9 @@ function Cell(i, j, state) {
 
   }
 
+  this.getGridIndex = function(){
+    let index = this.j * rows + this.i;
+    return index; 
+  }
+
 }
