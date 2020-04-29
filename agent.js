@@ -1,3 +1,8 @@
+/*
+  Code for the agent class, each agent has a brain object from brain.js
+  parts of the code adapted fom https://github.com/jameshball/MazeAI/
+*/
+
 function Agent(brain) {
   this.pos = createVector(start.x + scl / 2, start.y + scl / 2);
   this.vel = createVector(0, 0);
@@ -10,7 +15,7 @@ function Agent(brain) {
   this.fitness = 0;
   this.hitWall = false;
 
-  // IF the agent is created with a brain, then use that brain.
+  // If the agent is created with a brain, then use that brain.
   // Otherwise, create a new brain.
 
   if (brain) {
@@ -21,7 +26,7 @@ function Agent(brain) {
 
 
 
-
+  // Draw the agent
   this.show = function() {
     if (this.isBest) {
       push();
@@ -39,6 +44,7 @@ function Agent(brain) {
 
   }
 
+  // Move the agent
   this.move = function() {
     if (this.brain.step < this.brain.directions.length) {
       this.acc = this.brain.directions[this.brain.step];
@@ -49,12 +55,13 @@ function Agent(brain) {
       this.calculateFitness();
     }
 
-
+    // Limit the agents
     this.vel.add(this.acc);
     this.vel.limit(MAX_SPEED);
     this.pos.add(this.vel);
   }
 
+  // Calculte if agent is dead or finished at every step
   this.update = function() {
 
     if (this.isColliding()) {
@@ -71,7 +78,7 @@ function Agent(brain) {
     }
   }
 
-
+  // Functions to check if the agent has hit a wall
   this.isColliding = function() {
     if (this.pos.x - this.rad <= 0 || this.pos.x + this.rad >= width || this.pos.y - this.rad <= 0 || this.pos.y + this.rad >= height) {
 
@@ -115,8 +122,7 @@ function Agent(brain) {
 
 
 
-  /* This is the fitness function for this algorithm. It uses the distance to the goal,
-   along with the speed at which it reached the goal. */
+  // Function to calculate the agent fitness based on its distance to the goal and step count
   this.calculateFitness = function() {
     let distToGoal = dist(this.pos.x, this.pos.y, end.x + scl / 2, end.y + scl / 2);
     if (this.finished) {

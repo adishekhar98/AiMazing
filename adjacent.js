@@ -1,3 +1,4 @@
+// Returns an array of adjacent cells for any given cell index
 function adjacent(i) {
   var adjacentArr = [];
   var w = rows;

@@ -1,3 +1,5 @@
+
+// Init variables
 let cols, rows;
 let scl = 50;
 let grid = [];
@@ -23,13 +25,7 @@ let select;
 let barriers = [];
 
 
-/*
-
-
-MAZE AI RELATED
-
-*/
-
+// Agent realted variable
 let stepCount = 60;
 let generation = 0
 let averageFitness = 0;
@@ -38,11 +34,9 @@ let agent_Radius
 let agent_lifespan = 500;
 const MUTATION_RATE = 0.001;
 const MAX_SPEED = 10;
-//const POPULATION_SIZE = 500;
 const POPULATION_SIZE = 500;
-/*
-*/
 
+// setup p5.js
 function setup() {
   var canvas = createCanvas(windowWidth, windowHeight);
   frameRate(60);
@@ -52,9 +46,7 @@ function setup() {
   createInterface();
 }
 
-
-
-
+// This loops 60 times a second, updating the canvas each time
 function draw() {
   background(51);
   // Get the speed value from the slider
@@ -94,10 +86,6 @@ function mousePressed() {
 }
 
 
-
-
-
-
 function invert() {
   for (cell of grid) {
     cell.fliptile();
@@ -120,7 +108,6 @@ function resetButtonPressed() {
   solve = false;
   mazeGenerated = false;
 }
-
 
 
 function checkSearchMethod(){

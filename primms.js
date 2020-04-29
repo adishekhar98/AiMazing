@@ -1,3 +1,7 @@
+/*
+  Created a random maze using Primms maze-generation algorithm
+*/
+
 let walls = [];
 let wall;
 let lastCell;
@@ -10,7 +14,7 @@ function primms() {
     walls.push(getWalls(startIndex)[i]);
   }
 
-
+  // Randomly break walls in the maze to create a continous path from start to goal
   while (walls.length > 0) {
     wall = popRandom(walls);
 
@@ -24,6 +28,7 @@ function primms() {
     }
 
   }
+  // Move the goal to the last square created in the maze
   console.log('maze generated');
   grid[wall].state = 'f';
   endNodeIndex = wall;
@@ -32,7 +37,7 @@ function primms() {
 }
 
 
-
+// Custom function to pop a random element from an array
 const popRandom = arr => {
   return arr.splice(floor(random(arr.length)), 1);
 }

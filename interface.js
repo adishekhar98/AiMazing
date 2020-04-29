@@ -1,15 +1,20 @@
 function createInterface(){
-  createP('');
-  createP('Choose a grid size:');
+  //createP('');
+  var gridtext = createP('Choose a grid size:');
+  gridtext.parent('UI-holder');
   select = createSelect();
   select.option('small');
   select.option('medium');
   select.option('large');
   select.selected('medium');
   select.changed(checkGridSize);
-  createP('Adjust Solve Speed:');
+  select.parent('UI-holder');
+  var slidertext = createP('Adjust Solve Speed:');
+  slidertext.parent('UI-holder');
   speedSlider = createSlider(1, 60, 1);
-  createP('Choose a solve method:');
+  speedSlider.parent('UI-holder');
+  var radiotext = createP('Choose a solve method:');
+  radiotext.parent('UI-holder');
   radio = createRadio();
   radio.option('Depth First Search');
   radio.option('Breadth First Search');
@@ -17,18 +22,20 @@ function createInterface(){
   radio.option('A* Search');
   radio.option('Genetic Algorithm');
   radio.value('Depth First Search');
-  createP("");
+  radio.parent('UI-holder')
+  //createP("");
   var solveButton = createButton('Solve');
   var resetButton = createButton('Reset');
   var primmsButton = createButton('Generate A Maze');
   var invertButton = createButton('Invert Squares');
   solveButton.mousePressed(solveButtonPressed);
+  solveButton.parent("Button-holder");
   resetButton.mousePressed(resetButtonPressed);
-  resetButton.parent('UI-holder');
+  resetButton.parent("Button-holder");
   primmsButton.mousePressed(primms);
-  primmsButton.parent('UI-holder');
+  primmsButton.parent("Button-holder");
   invertButton.mousePressed(invert);
-  invertButton.parent('UI-holder');
+  invertButton.parent("Button-holder");
 }
 
 function createGrid(){

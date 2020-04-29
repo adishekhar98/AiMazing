@@ -1,4 +1,12 @@
+/*
+  Cell.js functions as a class for the cells of the grid
+  Each cell keeps track of its positon and states
+
+*/
+
 function Cell(i, j, state) {
+
+  // Row and Col index, and
   this.i = i;
   this.j = j;
   this.x = this.i * scl;
@@ -14,12 +22,12 @@ function Cell(i, j, state) {
   this.queued = false;
   this.inpath = false;
 
-  //for a*
-
+  // For a* and GBFS
   this.f = Infinity;
   this.g = Infinity;
   this.h = Infinity;
 
+  // Displays the cell, with the appropriate colour given its state
   this.show = function() {
 
     if (this.state == 1) {
@@ -45,6 +53,8 @@ function Cell(i, j, state) {
     rect(this.x, this.y, scl, scl);
   }
 
+
+  // Changes cell state when clicked
   this.clicked = function() {
 
     var d = dist(mouseX, mouseY, this.x + scl / 2, this.y + scl / 2);
@@ -63,6 +73,7 @@ function Cell(i, j, state) {
     }
   }
 
+  // Resets the grid
   this.resetTiles = function() {
     this.visited = false;
     this.queued = false;
@@ -77,6 +88,7 @@ function Cell(i, j, state) {
     }
   }
 
+  // Resets the search parameters while maintaining the maze
   this.resetSearch = function() {
     this.queued = false;
     this.visited = false;
@@ -88,13 +100,10 @@ function Cell(i, j, state) {
   }
 
 
-
   this.visit = function() {
     this.visited = true;
   }
 
-  this.createBarriers = function(){
 
-  }
 
 }

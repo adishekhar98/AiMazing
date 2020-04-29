@@ -1,3 +1,5 @@
+// Returns the shortest path by tracing back each node's parent
+
 function shortestPath(node) {
   shortestPathLen = 0; 
   let path = [];

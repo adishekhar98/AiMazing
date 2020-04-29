@@ -1,12 +1,19 @@
+/*
+  Code for running Breadth First Search
+*/
+
 var queue = [];
 queue.push(0)
 
 function bfsStep() {
   stepsTaken++
 
+  // As long as the queue is not empty, run BFS
   if (queue.length > 0) {
     var v = queue.shift();
     var node = grid[v];
+
+    // If a solution has been found, show the shortest path
     if (node.state == 'f') {
       solutionFound = true;
       node.inpath = true;
@@ -17,7 +24,7 @@ function bfsStep() {
       }
     }
 
-    // if node has not been visited, visit it and add adjacent nodes to the queue
+    // If node has not been visited, visit it and add adjacent nodes to the queue
     if (!node.visited) {
       node.visited = true;
 
@@ -37,11 +44,9 @@ function bfsStep() {
     solve = false;
 
   }
-
-
 }
 
-
+// Reset serach variables
 function bfsReset() {
   showSolveMetrics = false;
   solutionFound = false;

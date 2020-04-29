@@ -1,3 +1,8 @@
+/*
+  Code for running Depth First Search
+*/
+
+
 var stack = [];
 stack.push(0)
 
@@ -6,12 +11,12 @@ function dfsStep() {
   stepsTaken++
 
 
-
+  // As long as the queue is not empty, run DFS
   if (stack.length > 0) {
     var v = stack.pop();
     var node = grid[v];
 
-    //if the current node is the finish, then print "finished" and return
+    // If a solution has been found, show the shortest path
     if (node.state == 'f') {
       solutionFound = true;
       node.inpath = true;
@@ -23,7 +28,7 @@ function dfsStep() {
 
     }
 
-    // if node has not been visited, visit it, and add adjacent nodes to the queue
+    // If node has not been visited, visit it and add adjacent nodes to the stack
     if (!node.visited) {
       node.visited = true;
 
@@ -43,7 +48,7 @@ function dfsStep() {
 
 }
 
-
+// Reset serach variables
 function dfsReset() {
   showSolveMetrics = false;
   solutionFound = false;
