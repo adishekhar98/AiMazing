@@ -78,7 +78,7 @@ function draw() {
     drawTextGA();
   }
 
-  if(showSolveMetrics and !populationCreated){
+  if(showSolveMetrics && !populationCreated){
     drawTextSolve();
   }
 }
