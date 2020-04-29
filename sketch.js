@@ -44,8 +44,10 @@ const POPULATION_SIZE = 500;
 */
 
 function setup() {
+  var canvas = createCanvas(windowWidth, windowHeight);
   frameRate(60);
   createCanvas(500, 500);
+  canvas.parent('sketch-holder');
   createGrid();
   createInterface();
 }

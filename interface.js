@@ -1,12 +1,15 @@
 function createInterface(){
   createP('');
+  createP('Choose a grid size:');
   select = createSelect();
   select.option('small');
   select.option('medium');
   select.option('large');
   select.selected('medium');
   select.changed(checkGridSize);
+  createP('Adjust Solve Speed:');
   speedSlider = createSlider(1, 60, 1);
+  createP('Choose a solve method:');
   radio = createRadio();
   radio.option('Depth First Search');
   radio.option('Breadth First Search');
@@ -21,8 +24,11 @@ function createInterface(){
   var invertButton = createButton('Invert Squares');
   solveButton.mousePressed(solveButtonPressed);
   resetButton.mousePressed(resetButtonPressed);
+  resetButton.parent('UI-holder');
   primmsButton.mousePressed(primms);
+  primmsButton.parent('UI-holder');
   invertButton.mousePressed(invert);
+  invertButton.parent('UI-holder');
 }
 
 function createGrid(){

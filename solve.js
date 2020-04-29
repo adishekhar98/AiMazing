@@ -21,7 +21,7 @@ function doSolveStep(){
         case 'A* Search':
           aStarStep();
           break;
-        case 'Best First Search':
+        case 'Greedy Best First Search':
           bStarStep();
           break;
       }
